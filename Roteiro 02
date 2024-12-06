@@ -1,0 +1,30 @@
+-- Aluna: Maria Luiza Galdino Medeiros 123110614
+-- Este é um documento mais completo com o passo a passo de cada questão documentado
+
+-- Questão 01
+-- Primeiramente, eu criarei uma tabela do BD para realizar as inserções com os atributos necessários
+create table tarefas( id varchar(10), descricao text, func_resp_cf varchar(11), prioridade INTEGER, status varchar(1) );
+-- Comandos 1
+insert into tarefas values(2147483646, 'limpar chão do corredor central', '98765432111', 0, 'F');
+insert into tarefas values(2147483647, 'limpar janelas da sala 203', '98765432122', 1, 'F');
+insert into tarefas values(null, null, null, null, null);
+-- Os inserts que eram pra dar não autorizados agiram como o esperado!
+-- Primeiro exemplo retornou ERROR:  value too long for type character varying(11)
+-- Segundo exemplo retornou ERROR:  value too long for type character varying(1)
+
+-- Questão 02
+-- Comandos 2
+insert into tarefas values(2147483648, 'limpar portas do térreo', '32323232955', 4, 'A');
+-- Minha inserção foi concluída com sucesso de primeira, então não precisei fazer nenhum ajuste.
+
+-- Questão 03
+-- Para atingir o proposto no enunciado, realizarei a troca do tipo do meu atributo prioridade de integer para small int, usando o seguinte comando:
+alter table tarefas alter column prioridade type smallint;
+-- Comandos 3
+-- insert into tarefas values(2147483649, 'limpar portas da entrada principal', '32322525199', 32768, 'A' ); retornou ERROR:  smallint out of range
+-- insert into tarefas values(2147483650, 'limpar janelas da entrada principal', '32333233288', 32769, 'A' ); retornou ERROR:  smallint out of range
+-- Comandos 4
+insert into tarefas values(2147483651, 'limpar portas do 1o andar', '32323232911', 32767, 'A' );
+insert into tarefas values(2147483652, 'limpar portas do 2o andar', '32323232911', 32766, 'A' );
+
+-- Questão 04 nao deu tempo!
