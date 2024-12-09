@@ -79,7 +79,47 @@ alter table tarefas add constraint possibilidade_prioridade check (prioridade >=
 --DETAIL:  Failing row contains (2147482456, testar nova constraint, 10298085461, 48, P).
 
 -- Questão 08
--- Primeiro crio a relação do supervisor. Idealmente, setor deve ser uma chave estrangeira representando o identificador do setor onde ele trabalha.
-create table supervisor(cpf char(11) primary key, data_nasc date not null, nome varchar(50) not null, setor varchar(11) not null, email varchar(30) not null, telefone char(11) constraint set_cel check (length(telefone) = 11)); 
-create table funcionario(cpf char(11) primary key, data_nasc date not null, nome varchar(50) not null, funcao varchar(11) constraint set_funcao check (funcao = 'LIMPEZA' or funcao = 'SUP_LIMPEZA'), nivel char(1) constraint check_nivel check (nivel = 'J' or nivel = 'P' or nivel = 'S'), superior_cpf char(11) references supervisor (cpf));
+-- Eu só percebi depois que faltavam algumas restrições de not null após a criação da tabela, aí ajeitei depois
+create table funcionario(cpf char(11) primary key, data_nasc date not null, nome varchar(50) not null, funcao varchar(11) constraint set_funcao check ((funcao = 'LIMPEZA' and superior_cpf is not null) or funcao = 'SUP_LIMPEZA' and superior_cpf is null), nivel char(1) constraint check_nivel check (nivel = 'J' or nivel = 'P' or nivel = 'S'), superior_cpf char(11) references funcionario (cpf));
+alter table funcionario alter column funcao set not null;
+alter table funcionario alter column nivel set not null;
+-- Comandos 8:
 insert into funcionario values('12345678911', '1980-05-07', 'Pedro da Silva', 'SUP_LIMPEZA', 'S', null);
+insert into funcionario values('12345678912', '1980-03-08', 'Jose da Silva', 'LIMPEZA', 'J', '12345678911');
+-- O último comando reagiu com o erro esperado, de forma que:
+--insert into funcionario values('12345678913', '1980-04-09', 'joao da Silva', 'LIMPEZA', 'J', null);
+--ERROR:  new row for relation "funcionario" violates check constraint "set_funcao"
+--DETAIL:  Failing row contains (12345678913, 1980-04-09, joao da Silva, LIMPEZA, J, null).
+
+-- Questão 09
+-- Serão executadas:
+insert into funcionario values('12345678914', '1990-03-20', 'Antonio da Costa', 'SUP_LIMPEZA', 'J', null);
+insert into funcionario values('12345678915', '1980-04-10', 'Maria Luiza Galdino', 'SUP_LIMPEZA', 'P', null);
+insert into funcionario values('12345678916', '2005-02-20', 'Guilherme Jose', 'SUP_LIMPEZA', 'S', null);
+insert into funcionario values('12345678917', '1999-12-15', 'Lais Costa', 'LIMPEZA', 'J', '12345678915');
+insert into funcionario values('12345678918', '1983-08-07', 'Luiz Medeiros', 'LIMPEZA', 'J', '12345678916');
+insert into funcionario values('12345678919', '1980-04-06', 'Lidiany Felix', 'LIMPEZA', 'J', '12345678914');
+insert into funcionario values('12345678920', '1973-09-04', 'Khetleen Crystyna', 'LIMPEZA', 'J', '12345678915');
+insert into funcionario values('12345678921', '1997-08-14', 'Olivia Morais', 'LIMPEZA', 'J','12345678914');
+insert into funcionario values('12345678922', '2003-10-23', 'Camille Farias', 'LIMPEZA', 'J', '12345678915');
+-- Não serão executadas:
+--insert into funcionario values('12345678923', '2003-10-23', 'Sofia Silva', 'SUP_LIMPEZA', 'J', '12345678915');
+--insert into funcionario values('12345678924', '2003-10-23', 'Adalberto Cajueiro', 'LIMPEZA', 'J', null);
+--insert into funcionario values('12345678925', '2003-10-23', 'Tiago Massoni', 'LIMPEZA', 'J', null);
+--insert into funcionario values('12345678926', '2003-10-23', 'Patricia Machado', 'LIMPEZA', null, '12345678915');
+--insert into funcionario values(null, '2003-10-23', 'Eanes Torres', 'LIMPEZA', 'J', '12345678915');
+--insert into funcionario values('12345678928', null, 'Joseana Macedo', 'LIMPEZA', 'J', '12345678915');
+--insert into funcionario values('12345678929', '2003-10-23', null, 'LIMPEZA', 'J', '12345678915');
+--insert into funcionario values('12345678922', '2003-10-23', 'Joao Arthur', null, 'J', '12345678915');
+--insert into funcionario values('12345678911', '2003-10-23', 'Dalton Serey', 'LIMPEZA', 'J', '12345678915');
+--insert into funcionario values('12345678923', '2003-10-23', 'Dalton Serey', 'LIMPEZA', 'J', '12345678932');
+
+-- Questão 10
+-- A constraint de chave estrangeira já foi adicionada desde a criação da tabela! Mas estava incompleta, uma vez que o cpf do superior poderia funcionar sem que esse cpf pertencente a um funcionario em cargos de supervisão, mas não sei ajeitar!
+-- Opção 1: Não foi possível, já que o cpf do supervisor estava sendo usada como chave estrangeira em outras tuplas.
+-- Opção 2: ERROR:  update or delete on table "funcionario" violates foreign key constraint "funcionario_superior_cpf_fkey" on table "funcionario"
+
+-- Questão 11
+alter table tarefas alter column func_resp_cpf drop not null;
+-- Não consegui declarar essa especificidade;
+
