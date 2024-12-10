@@ -114,12 +114,11 @@ insert into funcionario values('12345678922', '2003-10-23', 'Camille Farias', 'L
 --insert into funcionario values('12345678911', '2003-10-23', 'Dalton Serey', 'LIMPEZA', 'J', '12345678915');
 --insert into funcionario values('12345678923', '2003-10-23', 'Dalton Serey', 'LIMPEZA', 'J', '12345678932');
 
--- Questão 10
+-- Questão 10alter table tarefas add constraint checa_null check ((status = 'P') or status != 'P' and func_resp_cpf is not null); 
 -- A constraint de chave estrangeira já foi adicionada desde a criação da tabela! Mas estava incompleta, uma vez que o cpf do superior poderia funcionar sem que esse cpf pertencente a um funcionario em cargos de supervisão, mas não sei ajeitar!
 -- Opção 1: Não foi possível, já que o cpf do supervisor estava sendo usada como chave estrangeira em outras tuplas.
 -- Opção 2: ERROR:  update or delete on table "funcionario" violates foreign key constraint "funcionario_superior_cpf_fkey" on table "funcionario"
 
 -- Questão 11
 alter table tarefas alter column func_resp_cpf drop not null;
--- Não consegui declarar essa especificidade;
-
+alter table tarefas add constraint checa_null check ((status = 'P') or status != 'P' and func_resp_cpf is not null); 
