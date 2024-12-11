@@ -1,0 +1,38 @@
+-- Aluna Maria Luiza Galdino Medeiros 123110614
+
+drop owned by marialgm;
+
+-- Criação dos estados através de um enum
+create type estados as enum('PI', 'PB', 'MA', 'CE', 'RN', 'SE', 'BA', 'AL', 'PE');
+-- O identificador de farmácias será um número inteiro
+create table farmacia(
+    id_farmacia integer primary key,
+    bairro varchar(20) unique,
+    cidade varchar(20),
+    estado estados not null,
+    tipo varchar(6) constraint checa_tipo check (tipo = 'sede' or tipo = 'filial') not null,
+    gerente char(11) constraint checa_entrada check (length(gerente)=11) not null,
+);
+-- Adiconar a restrição que há apenas uma sede
+alter table farmacia add constraint unica_sede exclude using gist (tipo with =) where (tipo = 'sede');
+-- Criar os tipos de funcionarios, onde f: funcionários, v: vendedores, e: entregadores, c: caixas, a: administradores
+create type funcoes as enum('F', 'V', 'E', 'C', 'A');
+-- Criar a tabela de funcionários
+create table funcionarios (
+    cpf char(11) primary key,
+    nome varchar(50),
+    data_nasc date,
+    farmacia integer references farmacia(id_farmacia),
+    funcao funcoes not null
+);
+-- Adicionar a foreign key do gerente
+alter table farmacia add constraint gerente_funcionario foreign key(gerente) references funcionarios(cpf);
+-- Adicionar restrição sobre a função dos gerentes criando uma coluna redundante na tabela farmacia
+alter table farmacia add column func_gerente funcoes; 
+alter table farmacia add constraint checa_funcao_gerente check(
+    gerente in(
+        select cpf from funcionario where funcao in ('f', 'a')
+    )
+);
+
+
